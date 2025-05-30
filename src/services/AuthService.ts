@@ -162,6 +162,8 @@ export class AuthService {
                 throw ApiError.unauthorized('Invalid refresh token');
             }
 
+             await this.refreshTokenRepository.invalidateToken(refreshToken);
+
             // Generate new tokens
             const newAccessToken = this.generateAccessToken(tokenDoc.user);
             const newRefreshToken = this.generateRefreshToken(tokenDoc.user);

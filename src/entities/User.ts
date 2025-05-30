@@ -35,13 +35,13 @@ export class User {
   @IsBoolean()
   isVerified: boolean;
 
-  @ManyToOne(() => Role, role => role.users, { eager: true })
+  @ManyToOne(() => Role, role => role.users, { eager: false })
   @JoinColumn({ name: "roleId" })
   role: Role;
 
   @ManyToOne(() => Company, company => company.users, {
     nullable: false,
-    eager: true,
+    eager: false,
   })
   @JoinColumn({ name: 'companyId' })
   company: Company;

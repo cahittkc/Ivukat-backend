@@ -44,6 +44,9 @@ export class CaseController {
     getByCompany = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const companyId = Number(req.params.companyId);
+            if (isNaN(companyId)) {
+                return next(new ApiError(StatusCodes.BAD_REQUEST, 'Invalid company ID'));
+            }
             const cases = await this.caseService.getCasesByCompany(companyId);
             successResponse(res, cases, "Cases for company listed", StatusCodes.OK);
         } catch (error) {

@@ -34,7 +34,8 @@ export class UserRepository {
 
     async findByUsername(username: string): Promise<User | null> {
         return await this.repository.findOne({
-            where: { username }
+            where: { username },
+            relations : ['role','company']
         });
     }
 
@@ -43,13 +44,26 @@ export class UserRepository {
         return await this.repository.find();
     }
 
-    async getCompanyEmployees(companyId: number): Promise<User[]> {
+    async getCompanyEmployees(companyId: number, roleId?: number): Promise<User[]> {
+        const whereCondition: any = {
+            company: { id: companyId },
+            isOwner: false,
+            
+        };
+
+        if (roleId) {
+            whereCondition.role = { id: roleId };
+        }
+
         return await this.repository.find({
-            where: { 
-                company: { id: companyId },
-                isOwner: false // Exclude owners
-             },
-            relations: ['role', 'company']
+            select: {
+                id: true,
+                firstName: true,
+                middleName: true,
+                lastName: true
+            },
+            where: whereCondition,
+            relations: ['role']
         });
     }
 
@@ -59,10 +73,7 @@ export class UserRepository {
                 company: { id: companyId },
                 isOwner: true // Exclude owners
              },
-            relations: ['role', 'company']
         });
     }
-    
-
 
 }
