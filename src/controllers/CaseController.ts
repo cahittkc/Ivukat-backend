@@ -4,6 +4,7 @@ import { CaseService } from "../services/CaseService";
 import { successResponse } from "../utils/responseHandler";
 import { StatusCodes } from "http-status-codes";
 import { ApiError } from "../utils/ApiError";
+import { CaseBySelfDto } from "../dtos/getcasebyself.dto"; 
 
 export class CaseController {
     private caseService: CaseService;
@@ -127,4 +128,22 @@ export class CaseController {
             }
         }
     };
+
+    getCaseBySelf = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const body =  req.body as CaseBySelfDto
+            const data = await this.caseService.getCasesBySelf(body);
+            successResponse(res, data, 'Cases Listed Succesfull', StatusCodes.OK)
+        } catch (error: any) {
+            if (error instanceof ApiError) {
+                next(error);
+            } else {
+                next(new ApiError(
+                    StatusCodes.INTERNAL_SERVER_ERROR,
+                    'Failed to remove lawyers from case',
+                    { error: error.message }
+                ));
+            }
+        }
+    }
 }

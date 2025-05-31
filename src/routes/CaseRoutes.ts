@@ -14,5 +14,6 @@ router.post("/add-lawyer", controller.addLawyer as RequestHandler);
 router.post("/remove-lawyers", controller.removeLawyers as RequestHandler);
 router.put("/update-case/:id", controller.update as RequestHandler);
 router.delete("/delete-case/:id", controller.delete as RequestHandler);
+router.post('/get-case-by-self', controller.getCaseBySelf as RequestHandler)
 
 export default router;

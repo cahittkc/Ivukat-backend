@@ -46,7 +46,6 @@ export class AuthController {
 
     register = async (req: any, res: any, next : NextFunction) => {
         try {
-           
             const userData = req.body as RegisterDto;
             const user = await this.authService.register(userData);
             const sanitizedUser = this.sanitizeUser(user);

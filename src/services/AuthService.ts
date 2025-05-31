@@ -157,16 +157,28 @@ export class AuthService {
     }> {
         try {
             // Find and validate refresh token
+            console.log("refreshToken",refreshToken);
+            
             const tokenDoc = await this.refreshTokenRepository.findByToken(refreshToken);
+
+            console.log("tokendoc",tokenDoc);
+            
             if (!tokenDoc || !tokenDoc.isValid || tokenDoc.expiresAt < new Date()) {
-                throw ApiError.unauthorized('Invalid refresh token');
+                throw ApiError.unauthorized('Invalid refresh token2');
             }
 
-             await this.refreshTokenRepository.invalidateToken(refreshToken);
+             
+            await this.refreshTokenRepository.invalidateToken(refreshToken);
+
+            const fullUser = await this.userRepository.findById(tokenDoc.user.id)
+
+            if(!fullUser){
+                throw ApiError.unauthorized('Invalid refresh token2')
+            }
 
             // Generate new tokens
-            const newAccessToken = this.generateAccessToken(tokenDoc.user);
-            const newRefreshToken = this.generateRefreshToken(tokenDoc.user);
+            const newAccessToken = this.generateAccessToken(fullUser);
+            const newRefreshToken = this.generateRefreshToken(fullUser);
 
             // Calculate expiration time in seconds
             const expiresInSeconds = this.parseExpiresIn(JWT_EXPIRES_IN);
@@ -174,7 +186,7 @@ export class AuthService {
             const expiresIn = Date.now() + (expiresInSeconds * 1000); 
 
             // Invalidate old refresh token
-            await this.refreshTokenRepository.invalidateToken(refreshToken);
+            // await this.refreshTokenRepository.invalidateToken(refreshToken); // Tekrarlanan satır kaldırıldı
 
             // Save new refresh token
             const expiresAt = new Date();
@@ -192,9 +204,10 @@ export class AuthService {
                 accessToken: newAccessToken,
                 expiresIn
             };
-        } catch (error) {
+        } catch (error: any) {
+            console.error("Error in AuthService.refresh try block:", error);
             if (error instanceof ApiError) throw error;
-            throw ApiError.unauthorized('Invalid refresh token');
+            throw ApiError.unauthorized('Invalid refresh token3');
         }
     }
 
@@ -223,6 +236,13 @@ export class AuthService {
     }
 
     private generateAccessToken(user: User): string {
+        // Kullanıcının ve rolünün varlığını kontrol et
+        if (!user || !user.role) {
+            // Hata durumunu loglayabilir veya farklı bir işlem yapabilirsiniz
+            console.error("Error: User or user role is undefined for access token generation.", user);
+            throw new Error("Cannot generate access token: User or role information is missing.");
+        }
+
         const payload = {
             id: user.id,
             email: user.email,

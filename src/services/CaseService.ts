@@ -5,6 +5,7 @@ import { CaseTypeRepository } from "../repositories/CaseTypeRepository";
 import { UserRepository } from "../repositories/UserRepository";
 import { ApiError } from "../utils/ApiError";
 import { User } from "../entities/User";
+import { CaseBySelfDto } from "../dtos/getcasebyself.dto";
 
 export class CaseService {
     private caseRepository: CaseRepository;
@@ -142,5 +143,23 @@ export class CaseService {
 
         // 6. Güncelle
         return await this.caseRepository.update(caseId, { lawyers: updatedLawyers });
+    }
+
+    async getCasesBySelf(data : CaseBySelfDto){
+        if(!data.userId){
+            throw ApiError.badRequest('user id required field');
+        }
+
+        if(!data.companyId){
+            throw ApiError.badRequest('companyId id required field');
+        }
+
+        if(data.isOwner){
+            const result = await this.caseRepository.getByCompany(data.companyId);
+            return result;
+        }else {
+            const result = await this.caseRepository.getByLawyer(data.userId)
+            return result;
+        }
     }
 }
