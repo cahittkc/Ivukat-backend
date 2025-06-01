@@ -108,17 +108,17 @@ export class AuthService {
         accessToken: string,
         refreshToken: string,
         expiresIn: number
-    }> {
+    } | { message : string}> {
         // Find user by username
         const user = await this.userRepository.findByUsername(username);
         if (!user) {
-            throw ApiError.conflict('Invalid username');
+            return { message : 'Invalid username'};
         }
 
         // Check password
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            throw ApiError.conflict('Invalid password');
+            return { message : 'Invalid password'};
         }
 
         // Generate tokens

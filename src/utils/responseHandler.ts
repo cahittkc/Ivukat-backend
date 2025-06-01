@@ -11,10 +11,11 @@ export const successResponse = <T>(
     res: Response,
     data: T | null = null,
     message: string = 'Success',
-    statusCode: number = StatusCodes.OK
+    statusCode: number = StatusCodes.OK,
+    successStatus?: boolean | null
 ): void => {
     const response: ApiResponse<T> = {
-        success: true,
+        success: successStatus ?? true,
         message,
         data
     };

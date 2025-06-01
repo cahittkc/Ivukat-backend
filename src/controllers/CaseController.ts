@@ -146,4 +146,14 @@ export class CaseController {
             }
         }
     }
+
+    getCaseDetails = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const id = Number(req.params.id);
+            const data = await this.caseService.getCaseDetails(id);
+            successResponse(res, data, 'Case Details Listed Succesfull', StatusCodes.OK)
+        } catch (error: any) {
+            next(error);
+        }
+    }
 }

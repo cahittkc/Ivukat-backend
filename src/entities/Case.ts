@@ -14,15 +14,15 @@ export class Case {
   @Column({ nullable: true })
   description: string;
 
-  @ManyToOne(() => Company, company => company.cases, { nullable: false, eager: true })
+  @ManyToOne(() => Company, company => company.cases, { nullable: false, eager: false })
   @JoinColumn({ name: "companyId" })
   company: Company;
 
-  @ManyToOne(() => CaseType, type => type.cases, { eager: true, nullable: false })
+  @ManyToOne(() => CaseType, type => type.cases, { eager: false, nullable: false })
   @JoinColumn({ name: "typeId" })
   type: CaseType;
 
-  @ManyToMany(() => User, user => user.cases, { eager: true })
+  @ManyToMany(() => User, user => user.cases, { eager: false })
   @JoinTable({
     name: "case_lawyers",
     joinColumn: { name: "caseId", referencedColumnName: "id" },

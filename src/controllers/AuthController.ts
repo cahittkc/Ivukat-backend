@@ -94,22 +94,33 @@ export class AuthController {
     login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { username, password } = req.body as LoginDto;
-            const { user, accessToken, refreshToken, expiresIn } = await this.authService.login(username, password, req);
+            const loginResult = await this.authService.login(username, password, req);
 
-            // Set refresh token in HTTP-only cookie
-            res.cookie('refreshToken', refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-            });
+            // Dönüş tipini kontrol etmek için Type Guard kullanma
+            // loginResult bir 'message' özelliğine sahipse (yani { message: string } tipi ise)
+            if ('message' in loginResult) {
+                // Sadece mesaj dönen senaryo
+                successResponse(res, {}, loginResult.message, StatusCodes.OK, false);
+            } else {
+                // Başarılı login objesi dönen senaryo ({ user, accessToken, refreshToken, expiresIn })
+                const { user, accessToken, refreshToken, expiresIn } = loginResult;
 
-            const sanitizedUser = this.sanitizeUserResponse(user);
-            successResponse(res, { 
-                ...sanitizedUser, 
-                accessToken,
-                expiresIn
-            }, 'Login successful', StatusCodes.OK);
+                // Set refresh token in HTTP-only cookie
+                res.cookie('refreshToken', refreshToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'strict',
+                    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+                });
+
+                const sanitizedUser = this.sanitizeUserResponse(user);
+                successResponse(res, {
+                    ...sanitizedUser,
+                    accessToken,
+                    expiresIn
+                }, 'Login successful', StatusCodes.OK);
+            }
+
         } catch (error: any) {
             if (error instanceof ApiError) {
                 next(error);

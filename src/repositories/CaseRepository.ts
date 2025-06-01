@@ -33,7 +33,7 @@ export class CaseRepository {
     async getByCompany(companyId: number): Promise<Case[]> {
         return await this.repository.find({
             where: { company: { id: companyId } },
-            relations: ["company", "type", "lawyers"]
+            relations: ["company", "type"]
         });
     }
 
@@ -68,6 +68,13 @@ export class CaseRepository {
     
         // 3. Kaydet ve döndür
         return await this.repository.save(caseEntity);
+    }
+
+    async getCaseDetails(id: number): Promise<Case | null> {
+        return await this.repository.findOne({
+            where: { id },
+            relations: ["company", "type", "lawyers"]
+        });
     }
 
     async delete(id: number): Promise<void> {

@@ -162,4 +162,11 @@ export class CaseService {
             return result;
         }
     }
+
+    async getCaseDetails(id: number){
+        const result = await this.caseRepository.getCaseDetails(id);
+        return result;
+    }
+
+
 }
