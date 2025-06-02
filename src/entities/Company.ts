@@ -16,7 +16,7 @@ export class Company {
   @Column({ length: 255, nullable: true })
   address: string;
 
-  @Column({ length: 15, nullable: true })
+  @Column({  nullable: true })
   phoneNumber: string;
 
   @Column({ unique: true })
